@@ -1,15 +1,17 @@
-const mysql = require("mysql2");
+const mongoose = require('mongoose')
 
-const db_connection = mysql
-  .createConnection({
-    host: "localhost", // HOST NAME
-    user: "root", // USER NAME
-    database: "RENT", // DATABASE NAME
-    password: "1234", // DATABASE PASSWORD
-    port: "3307"
-  })
-  .on("error", (err) => {
-    console.log("Failed to connect to Database - ", err);
-  });
+const url = `mongodb+srv://licenta:licenta@cluster0.dlytw.mongodb.net/?retryWrites=true&w=majority`;
 
-module.exports = db_connection;
+const connectionParams={
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true 
+}
+
+mongoose.connect(url,connectionParams)
+    .then( () => {
+        console.log('Connected to the database ')
+    })
+    .catch( (err) => {
+        console.error(`Error connecting to the database. n${err}`);
+    })
