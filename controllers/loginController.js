@@ -14,19 +14,18 @@ exports.login = async(req,res,next) => {
           if (err) return handleError(err);
 
           if(user.length == 0) {
-            return res.status(400).json({
+            return res.status(200).json({
                    message: "User not found",
+                   path: "/setPhone",
+                   email: req.body.email
               });
           }
           return res.status(201).json({
             message: "User succesfully signed in",
-            user: user
+            user: user,
+            path: "/search"
           });
-          console.log(user);
         })
-        // return res.status(201).json({
-        //     message: "User succesfully registered!",
-        // });
                         
     } catch(err){
         next(err);
