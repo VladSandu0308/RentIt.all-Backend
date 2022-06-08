@@ -2,6 +2,9 @@ const router = require('express').Router();
 const {body} = require('express-validator');
 const {register} = require('./controllers/registerController');
 const {login} = require('./controllers/loginController');
+const { addLocation } = require('./controllers/addLocationsController');
+const { getOwnLocations } = require('./controllers/getOwnLocationsController');
+const { getLocations } = require('./controllers/getLocationsController');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -27,5 +30,9 @@ router.post('/login',[
   .escape()
   .trim().isLength({min: 3}),
 ],login);
+
+router.post('/addLocation', [], addLocation);
+router.get('/getOwnLocations/:email', getOwnLocations);
+router.get('/getLocations/:email', getLocations);
 
 module.exports = router;
