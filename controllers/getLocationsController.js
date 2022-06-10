@@ -19,7 +19,8 @@ exports.getLocations = async(req,res,next) => {
         }
         if(locations.length == 0) {
           return res.status(200).json({
-                 message: "This user has no locations"
+                 message: "This user has no locations",
+                 locations: []
             });
         }
         return res.status(201).json({

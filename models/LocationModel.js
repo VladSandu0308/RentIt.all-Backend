@@ -38,10 +38,14 @@ const LocationSchema = new mongoose.Schema({
   size: {
     type: Number
   },
-  grade: {
+  price: {
     type: Number
   },
+
   review_count: {
+    type: Number
+  },
+  grade: {
     type: Number
   },
   facilities: {
