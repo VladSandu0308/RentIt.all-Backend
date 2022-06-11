@@ -7,6 +7,7 @@ const { getOwnLocations } = require('./controllers/getOwnLocationsController');
 const { getLocations } = require('./controllers/getLocationsController');
 const { updateLocation } = require('./controllers/updateLocationController');
 const { deleteLocation } = require('./controllers/deleteLocationController');
+const { getUser } = require('./controllers/getUser');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -33,9 +34,11 @@ router.post('/login',[
   .trim().isLength({min: 3}),
 ],login);
 
+router.get('/user/:email', getUser);
+
 router.post('/addLocation', [], addLocation);
 router.get('/getOwnLocations/:email', getOwnLocations);
-router.get('/getLocations/:email', getLocations);
+router.post('/getLocations/:email', getLocations);
 router.put('/location/:id', updateLocation);
 router.delete('/location/:id', deleteLocation);
 

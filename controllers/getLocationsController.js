@@ -8,9 +8,112 @@ exports.getLocations = async(req,res,next) => {
     if(!errors.isEmpty()){
         return res.status(422).json({ errors: errors.array() });
     }
+    
+    
 
     try{
-      locationModel.find({'host_email': { $ne: req.params.email}}, function (err, locations) {
+      let filters = {
+        'host_email': { $ne: req.params.email},
+      };
+
+      if (req.body.coords) {
+        filters = {...filters, coords: {
+          $near : {
+            $geometry: {type: "Point", coordinates: req.body.coords},
+            $maxDistance: req.body.max_dist ? req.body.max_dist : 5000
+          }
+        }}
+      }
+
+      if (req.body?.min_price) {
+        filters = {...filters, price: {$gte: req.body.min_price}}
+      }
+
+      if (req.body?.max_price) {
+        filters = {...filters, price: {$lte: req.body.max_price}}
+      }
+
+      if (req.body?.min_rooms) {
+        filters = {...filters, rooms: {$gte: req.body.min_rooms}}
+      }
+
+      if (req.body?.min_baths) {
+        filters = {...filters, baths: {$gte: req.body.min_baths}}
+      }
+
+      if(req.body?.facilities?.AC) {
+        filters = {...filters, "facilities.AC": true}
+      }
+
+      if(req.body?.facilities?.kitchen) {
+        filters = {...filters, "facilities.kitchen": true}
+      }
+
+      if(req.body?.facilities?.heat) {
+        filters = {...filters, "facilities.heat": true}
+      }
+
+      if(req.body?.facilities?.wifi) {
+        filters = {...filters, "facilities.wifi": true}
+      }
+
+      if(req.body?.facilities?.parking) {
+        filters = {...filters, "facilities.parking": true}
+      }
+
+      if(req.body?.facilities?.balcony) {
+        filters = {...filters, "facilities.balcony": true}
+      }
+
+      if(req.body?.facilities?.garden) {
+        filters = {...filters, "facilities.garden": true}
+      }
+
+      if(req.body?.facilities?.pool) {
+        filters = {...filters, "facilities.pool": true}
+      }
+
+      if('facilities' in req.body) {
+        if (req.body?.facilities['hot tub'])
+          filters = {...filters, "facilities.hot tub": true}
+      }
+
+      if(req.body?.facilities?.bbq) {
+        filters = {...filters, "facilities.bbq": true}
+      }
+
+      if(req.body?.facilities?.bedroom) {
+        filters = {...filters, "facilities.bedroom": true}
+      }
+
+      if(req.body?.facilities?.bathroom) {
+        filters = {...filters, "facilities.bathroom": true}
+      }
+
+      if(req.body?.facilities?.sports) {
+        filters = {...filters, "facilities.sports": true}
+      }
+
+      if(req.body?.facilities?.pets) {
+        filters = {...filters, "facilities.pets": true}
+      }
+
+      if(req.body?.facilities?.wash) {
+        filters = {...filters, "facilities.wash": true}
+      }
+
+      if(req.body?.furnished == "Yes") {
+        filters = {...filters, furnished: "yes"}
+      }
+
+      if(req.body?.furnished == "No") {
+        filters = {...filters, furnished: "no"}
+      }
+
+
+      console.log(filters);
+
+      locationModel.find(filters, function (err, locations) {
         if(err) {
           console.log(err);
           return res.status(400).json({
