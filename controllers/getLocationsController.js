@@ -14,6 +14,7 @@ exports.getLocations = async(req,res,next) => {
     try{
       let filters = {
         'host_email': { $ne: req.params.email},
+        'mode': req.body.mode
       };
 
       if (req.body.coords) {
@@ -39,6 +40,14 @@ exports.getLocations = async(req,res,next) => {
 
       if (req.body?.min_baths) {
         filters = {...filters, baths: {$gte: req.body.min_baths}}
+      }
+
+      if (req.body?.adults) {
+        filters = {...filters, adults: {$gte: req.body.adults}}
+      }
+
+      if (req.body?.kids) {
+        filters = {...filters, kids: {$gte: req.body.kids}}
       }
 
       if(req.body?.facilities?.AC) {
