@@ -81,6 +81,16 @@ const LocationSchema = new mongoose.Schema({
   img5: {
     type: String
   },
+  unavailableDates: {
+    type: [{
+      from: Date,
+      to: Date
+    }],
+    default: [{
+      from: 2022-06-12,
+      to: 2022-06-17
+    }]
+  }
 
 });
 

@@ -21,9 +21,22 @@ exports.getLocations = async(req,res,next) => {
         filters = {...filters, coords: {
           $near : {
             $geometry: {type: "Point", coordinates: req.body.coords},
-            $maxDistance: req.body.max_dist ? req.body.max_dist : 5000
+            $maxDistance: req.body.max_dist ? (req.body.max_dist * 1000) : 5000
           }
         }}
+      }
+
+      if(req.body.start && req.body.end) {
+        console.log("Start" + req.body.start);
+        console.log("ENd " + req.body.end)
+        filters = {...filters,
+          $and: [ {unavailableDates: {$elemMatch : {
+            $or: [
+              { from: {$gte: req.body.end}},
+              { to: {$lte: req.body.start}}
+            ]
+          }}}]
+        }
       }
 
       if (req.body?.min_price) {
