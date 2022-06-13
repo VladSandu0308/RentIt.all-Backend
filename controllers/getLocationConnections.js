@@ -21,7 +21,7 @@ exports.getLocationConnections = async(req,res,next) => {
           }
           return res.status(201).json({
             message: "Request succesfully returnes",
-            user: conn,
+            requests: conn,
           });
         })
                         

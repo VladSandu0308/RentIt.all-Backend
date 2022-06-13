@@ -19,9 +19,11 @@ exports.getUserConnections = async(req,res,next) => {
                    message: "This user has no requests",
               });
           }
+
+          
           return res.status(201).json({
             message: "User Requests succesfully returned",
-            requests: conn,
+            requests: conn
           });
         })
                         

@@ -19,6 +19,8 @@ const { deleteConnection } = require('./controllers/deleteConnection');
 const { updateUser } = require('./controllers/updateUser');
 const { deleteUser } = require('./controllers/deleteUser');
 const { getAllUsers } = require('./controllers/getAllUsers');
+const { getLocationById } = require('./controllers/getLocationById');
+const { getUserById } = require('./controllers/getUserById');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -46,12 +48,14 @@ router.post('/login',[
 ],login);
 
 router.get('/user/:email', getUser);
+router.get('/getUserById/:id', getUserById);
 router.put('/user/:id', updateUser);
 router.delete('/user/:id', deleteUser);
 router.get('/users', getAllUsers);
 
 router.post('/addLocation', [], addLocation);
 router.get('/getOwnLocations/:email', getOwnLocations);
+router.get('/getLocation/:id', getLocationById);
 router.post('/getLocations/:email', getLocations);
 router.put('/location/:id', updateLocation);
 router.delete('/location/:id', deleteLocation);
