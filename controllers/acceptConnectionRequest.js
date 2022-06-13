@@ -34,8 +34,9 @@ exports.acceptConnectionRequest = async(req,res,next) => {
 
              for (let i = 0; i < conn.length; ++i) {
                  console.log(`Dates ${conn[i].from} to ${conn[i].to}`);
-                if (conn[i].from < connection.to || conn[i].to > connection.from) {
+                if (!(conn[i].from > connection.to || conn[i].to < connection.from)) {
                     try{
+                        console.log(`INSIDE Dates ${connection.from} to ${connection.to}`);
                         console.log(`Request for ${conn[i].location_id} auto deleted`);
                         const updated = await connectionModel.findByIdAndUpdate(
                           conn[i]._id,
@@ -50,6 +51,15 @@ exports.acceptConnectionRequest = async(req,res,next) => {
                       }
                 }
              }
+
+             const location = await locationModel.findByIdAndUpdate(
+                connection.location_id,
+                { $push: {unavailableDates: {
+                    from: connection.from,
+                    to: connection.to
+                }} },
+                { new: true }
+            );     
 
              return res.status(201).json({
                 message: "Connection succesfully accepted and found conflict!",
