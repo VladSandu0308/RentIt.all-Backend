@@ -26,6 +26,14 @@ const UserSchema = new mongoose.Schema({
   purpose: {
     type: String
   },
+  review_count: {
+    type: Number,
+    default: 0
+  },
+  grade: {
+    type: Number,
+    default: 0
+  },
 
 });
 

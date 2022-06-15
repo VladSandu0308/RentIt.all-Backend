@@ -21,6 +21,9 @@ const { deleteUser } = require('./controllers/deleteUser');
 const { getAllUsers } = require('./controllers/getAllUsers');
 const { getLocationById } = require('./controllers/getLocationById');
 const { getUserById } = require('./controllers/getUserById');
+const { addUnavailableDates } = require('./controllers/addUnavilableDates');
+const { addGradeToUser } = require('./controllers/addGradeToUser');
+const { addGradeToLocation } = require('./controllers/addGrateToLocation');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -59,6 +62,7 @@ router.get('/getLocation/:id', getLocationById);
 router.post('/getLocations/:email', getLocations);
 router.put('/location/:id', updateLocation);
 router.delete('/location/:id', deleteLocation);
+router.put('/addUnavailableDates/:id', addUnavailableDates);
 
 router.post('/createConnection', [], clientRequestForLocation);
 router.put('/acceptConnection/:id', [], acceptConnectionRequest);
@@ -70,6 +74,9 @@ router.get('/getLocationBookings/:id', getLocationBookings);
 router.get('/getUserBookings/:id', getUserBookings);
 
 router.delete('/deleteRequest/:id', deleteConnection);
+
+router.put('/addRating/:id/:conn_id', addGradeToUser);
+router.put('/addRatingLocation/:id/:conn_id', addGradeToLocation);
 
 
 module.exports = router;

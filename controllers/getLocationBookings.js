@@ -12,11 +12,11 @@ exports.getLocationBookings = async(req,res,next) => {
 
     try{
          connectionModel.find({'location_id': req.params.id, 'completed': true}, function (err, conn) {
-          if (err) return handleError(err);
+          
 
           if(conn.length == 0) {
             return res.status(200).json({
-                   message: "This user has no bookings",
+                   message: "This location has no bookings",
               });
           }
           return res.status(201).json({

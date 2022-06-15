@@ -30,12 +30,16 @@ exports.getLocations = async(req,res,next) => {
         console.log("Start" + req.body.start);
         console.log("ENd " + req.body.end)
         filters = {...filters,
-          $and: [ {unavailableDates: {$elemMatch : {
+          unavailableDates: {$not: {$elemMatch: {
             $or: [
-              { from: {$gte: req.body.end}},
-              { to: {$lte: req.body.start}}
+              { from: {$gte: req.body.start, $lte: req.body.end}},
+              { to: {$gte: req.body.start, $lte: req.body.end}},
+              {$and: [
+                {from: {$lte: req.body.start}},
+                {to: {$gte: req.body.end}}
+              ]}
             ]
-          }}}]
+          }}}
         }
       }
 
@@ -133,7 +137,7 @@ exports.getLocations = async(req,res,next) => {
       }
 
 
-      console.log(filters);
+      console.log(JSON.stringify(filters, null, 4));
 
       locationModel.find(filters, function (err, locations) {
         if(err) {

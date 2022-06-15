@@ -9,7 +9,15 @@ const ConnectionSchema = new mongoose.Schema({
     type: String,
     default: "Client request"
   },
-  completed: Boolean
+  completed: Boolean,
+  reviewed_user: {
+    type: Boolean,
+    default: false
+  },
+  reviewed_location: {
+    type: Boolean,
+    default: false
+  }
 
 
 });
