@@ -1,5 +1,7 @@
 const {validationResult} = require('express-validator');
 const userModel = require('../models/UserModel');
+const locationModel = require('../models/LocationModel');
+const connectionModel = require('../models/ConnectionModel');
 
 exports.deleteUser = async(req,res,next) => {
     console.log("Enter delete user");
@@ -10,9 +12,23 @@ exports.deleteUser = async(req,res,next) => {
     }
 
     try{
-        await userModel.findByIdAndDelete(
+        const user = await userModel.findByIdAndDelete(
           req.params.id,
         );
+
+        console.log(user)
+
+        const location = await locationModel.deleteMany({'host_email': user.email});
+
+        
+
+        const connection = await connectionModel.deleteMany({'user_id': user._id});
+
+
+        console.log(location)
+
+        console.log(connection)
+
 
         return res.status(201).json({
             message: "User succesfully deleted"

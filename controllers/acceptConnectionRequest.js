@@ -20,6 +20,15 @@ exports.acceptConnectionRequest = async(req,res,next) => {
           { new: true}
         )
 
+        const location = await locationModel.findByIdAndUpdate(
+            connection.location_id,
+            { $push: {unavailableDates: {
+                from: connection.from,
+                to: connection.to
+            }} },
+            { new: true }
+        );
+
         try{
             connectionModel.find({'location_id': connection.location_id, 'completed': false}, async function (err, conn) {
              if (err) return handleError(err);
@@ -52,14 +61,9 @@ exports.acceptConnectionRequest = async(req,res,next) => {
                 }
              }
 
-             const location = await locationModel.findByIdAndUpdate(
-                connection.location_id,
-                { $push: {unavailableDates: {
-                    from: connection.from,
-                    to: connection.to
-                }} },
-                { new: true }
-            );     
+            
+            
+            console.log(location)
 
              return res.status(201).json({
                 message: "Connection succesfully accepted and found conflict!",

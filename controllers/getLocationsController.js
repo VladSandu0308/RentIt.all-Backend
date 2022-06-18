@@ -43,6 +43,10 @@ exports.getLocations = async(req,res,next) => {
         }
       }
 
+      if (req.body?.search) {
+        filters = {...filters, $text: { $search: req.body.search}}
+      }
+
       if (req.body?.min_price) {
         filters = {...filters, price: {$gte: req.body.min_price}}
       }
@@ -137,7 +141,7 @@ exports.getLocations = async(req,res,next) => {
       }
 
 
-      console.log(JSON.stringify(filters, null, 4));
+      console.log(JSON.stringify(filters, null, 1));
 
       locationModel.find(filters, function (err, locations) {
         if(err) {

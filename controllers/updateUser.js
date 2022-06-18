@@ -20,7 +20,7 @@ exports.updateUser = async(req,res,next) => {
 
         return res.status(201).json({
             message: "Location succesfully updatesd!",
-            location
+            user
         });
                         
     } catch(err){

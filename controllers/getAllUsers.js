@@ -10,10 +10,10 @@ exports.getAllUsers = async(req,res,next) => {
     }
 
     try{
-      userModel.find({}, function (err, users) {
+      userModel.find({'email': { $ne:'rentit.all.oficial@gmail.com'}}, function (err, users) {
         
 
-        if(users.length == 0) {
+        if(!users) {
           return res.status(200).json({
                  message: "This app has no users",
                  users: []
