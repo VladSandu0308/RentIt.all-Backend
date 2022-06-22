@@ -8,7 +8,7 @@ exports.login = async(req,res,next) => {
     if(!errors.isEmpty()){
         return res.status(422).json({ errors: errors.array() });
     }
-
+    
     try{
         userModel.find({'email': req.body.email}, function (err, user) {
           if (err) return handleError(err);

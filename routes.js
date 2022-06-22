@@ -24,6 +24,8 @@ const { getUserById } = require('./controllers/getUserById');
 const { addUnavailableDates } = require('./controllers/addUnavilableDates');
 const { addGradeToUser } = require('./controllers/addGradeToUser');
 const { addGradeToLocation } = require('./controllers/addGrateToLocation');
+const { addBlogPost } = require('./controllers/addBlogPost');
+const { getPosts } = require('./controllers/getBlogs');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -50,6 +52,7 @@ router.post('/login',[
   .trim().isLength({min: 3}),
 ],login);
 
+router.post('/register', [], register);
 router.get('/user/:email', getUser);
 router.get('/getUserById/:id', getUserById);
 router.put('/user/:id', updateUser);
@@ -77,6 +80,9 @@ router.delete('/deleteRequest/:id', deleteConnection);
 
 router.put('/addRating/:id/:conn_id', addGradeToUser);
 router.put('/addRatingLocation/:id/:conn_id', addGradeToLocation);
+
+router.post('/blog', [], addBlogPost);
+router.get('/blog', getPosts);
 
 
 module.exports = router;

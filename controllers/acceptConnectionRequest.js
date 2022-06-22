@@ -1,6 +1,8 @@
 const {validationResult} = require('express-validator');
 const locationModel = require('../models/LocationModel');
 const connectionModel = require('../models/ConnectionModel');
+var amqp = require('amqplib/callback_api');
+
 
 exports.acceptConnectionRequest = async(req,res,next) => {
     console.log("Enter accept connection");
@@ -29,6 +31,35 @@ exports.acceptConnectionRequest = async(req,res,next) => {
             { new: true }
         );
 
+        amqp.connect('amqp://rabbitmq', function(error0, connection) {
+            if (error0) {
+                throw error0;
+            }
+            connection.createChannel(function(error1, channel) {
+                if (error1) {
+                    throw error1;
+                }
+
+                var queue = 'queue';
+                var body = {
+                    email: req.body.email,
+                    subject: `Request accepted for location ${req.body.location_title}`,
+                    text: `Your request for location ${req.body.location_title} has been accepted. You can now start the payment process!`
+                };
+
+                let message = JSON.stringify(body);
+
+
+                channel.assertQueue(queue, {
+                    durable: true
+                });
+
+                channel.sendToQueue(queue, Buffer.from(message));
+                console.log(" [x] Sent %s", body.email);
+
+            });
+        });
+
         try{
             connectionModel.find({'location_id': connection.location_id, 'completed': false}, async function (err, conn) {
              if (err) return handleError(err);
@@ -39,14 +70,9 @@ exports.acceptConnectionRequest = async(req,res,next) => {
                 });
              }
 
-             console.log(`conn ${conn}`);
-
              for (let i = 0; i < conn.length; ++i) {
-                 console.log(`Dates ${conn[i].from} to ${conn[i].to}`);
                 if (!(conn[i].from > connection.to || conn[i].to < connection.from)) {
                     try{
-                        console.log(`INSIDE Dates ${connection.from} to ${connection.to}`);
-                        console.log(`Request for ${conn[i].location_id} auto deleted`);
                         const updated = await connectionModel.findByIdAndUpdate(
                           conn[i]._id,
                           { $set: {
