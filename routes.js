@@ -26,6 +26,7 @@ const { addGradeToUser } = require('./controllers/addGradeToUser');
 const { addGradeToLocation } = require('./controllers/addGrateToLocation');
 const { addBlogPost } = require('./controllers/addBlogPost');
 const { getPosts } = require('./controllers/getBlogs');
+const { contact } = require('./controllers/contact');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -83,6 +84,8 @@ router.put('/addRatingLocation/:id/:conn_id', addGradeToLocation);
 
 router.post('/blog', [], addBlogPost);
 router.get('/blog', getPosts);
+
+router.post('/contact', [], contact);
 
 
 module.exports = router;

@@ -1,10 +1,9 @@
 const {validationResult} = require('express-validator');
-const locationModel = require('../models/LocationModel');
-const connectionModel = require('../models/ConnectionModel');
 var amqp = require('amqplib/callback_api');
 
-exports.clientRequestForLocation = async(req,res,next) => {
-    console.log("Enter add connection");
+
+exports.contact = async(req,res,next) => {
+    console.log("Enter contact");
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -12,9 +11,6 @@ exports.clientRequestForLocation = async(req,res,next) => {
     }
 
     try{
-        const connection = new connectionModel(req.body);
-
-        await connection.save();
 
         amqp.connect('amqp://rabbitmq', function(error0, connection) {
             if (error0) {
@@ -27,10 +23,15 @@ exports.clientRequestForLocation = async(req,res,next) => {
 
                 var queue = 'queue';
                 var body = {
-                    from: 'house_share@gmail.com',
-                    to: req.body.host_email,
-                    subject: `New request for location ${req.body.location_title}`,
-                    text: `You have received a new request for location ${req.body.location_title}. Check your account!`
+                    from: req.body.email,
+                    to: 'rentit.all.oficial@gmail.com',
+                    subject: `A contact request has been made`,
+                    html: `You got a message from: <br>
+                      
+                      Full Name: ${req.body.first_name} ${req.body.last_name} <br>
+                      Email : ${req.body.email} <br>
+                      Phone: ${req.body.phone} <br>
+                      Message: ${req.body.message}`,
                 };
 
                 let message = JSON.stringify(body);
@@ -44,12 +45,14 @@ exports.clientRequestForLocation = async(req,res,next) => {
                 console.log(" [x] Sent %s", body.from);
 
                 return res.status(201).json({
-                    message: "Connection succesfully registered!",
+                    message: "Message delivered!",
                 });
 
             });
         });
-       
+                           
+
+        
                         
     } catch(err){
         next(err);

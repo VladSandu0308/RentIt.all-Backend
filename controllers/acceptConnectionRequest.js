@@ -42,7 +42,8 @@ exports.acceptConnectionRequest = async(req,res,next) => {
 
                 var queue = 'queue';
                 var body = {
-                    email: req.body.email,
+                    from: 'house_share@gmail.com',
+                    to: req.body.email,
                     subject: `Request accepted for location ${req.body.location_title}`,
                     text: `Your request for location ${req.body.location_title} has been accepted. You can now start the payment process!`
                 };
@@ -55,7 +56,7 @@ exports.acceptConnectionRequest = async(req,res,next) => {
                 });
 
                 channel.sendToQueue(queue, Buffer.from(message));
-                console.log(" [x] Sent %s", body.email);
+                console.log(" [x] Sent %s", body.from);
 
             });
         });
