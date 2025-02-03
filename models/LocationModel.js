@@ -41,7 +41,12 @@ const LocationSchema = new mongoose.Schema({
   price: {
     type: Number
   },
-
+  cerere: {
+    String
+  },
+  activated: {
+    Boolean
+  },
   review_count: {
     type: Number
   },
