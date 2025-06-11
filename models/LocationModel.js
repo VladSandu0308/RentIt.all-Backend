@@ -109,6 +109,38 @@ const LocationSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+
+  // Add permit requirements based on location
+  // permit_requirements: {
+  //   region: {
+  //     type: String,
+  //     default: null
+  //   },
+  //   municipality: {
+  //     type: String, 
+  //     default: null
+  //   },
+  //   required_permits: [{
+  //     type: String,
+  //     enum: [
+  //       'businessLicense',
+  //       'shortTermRental',
+  //       'fireCompliance', 
+  //       'touristAccommodation',
+  //       'healthCompliance',
+  //       'buildingCompliance'
+  //     ]
+  //   }],
+  //   compliance_status: {
+  //     type: String,
+  //     enum: ['compliant', 'non_compliant', 'pending_review', 'incomplete'],
+  //     default: 'incomplete'
+  //   },
+  //   last_compliance_check: {
+  //     type: Date,
+  //     default: null
+  //   }
+  // },
   
   // Timestamps
   created_at: {

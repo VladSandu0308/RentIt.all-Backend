@@ -67,6 +67,44 @@ class EmailService {
             `
         }),
 
+        permitSubmitted: (ministerEmail, locationTitle, permitType) => ({
+            from: 'house_share@gmail.com',
+            to: ministerEmail,
+            subject: `New Permit Application: ${permitType} for ${locationTitle}`,
+            html: `
+                <h2>📋 New Permit Application</h2>
+                <p>A new permit application has been submitted:</p>
+                <ul>
+                    <li><strong>Property:</strong> ${locationTitle}</li>
+                    <li><strong>Permit Type:</strong> ${permitType}</li>
+                    <li><strong>Status:</strong> Pending Review</li>
+                </ul>
+                <p>Please log into the Minister Panel to review this application.</p>
+            `
+        }),
+
+        permitReviewed: (hostEmail, locationTitle, permitType, status, permitNumber, rejectionReason) => ({
+            from: 'house_share@gmail.com',
+            to: hostEmail,
+            subject: `Permit ${status}: ${permitType} for ${locationTitle}`,
+            html: `
+                <h2>📋 Permit Application ${status}</h2>
+                <p>Your permit application has been reviewed:</p>
+                <ul>
+                    <li><strong>Property:</strong> ${locationTitle}</li>
+                    <li><strong>Permit Type:</strong> ${permitType}</li>
+                    <li><strong>Status:</strong> ${status}</li>
+                    ${permitNumber ? `<li><strong>Permit Number:</strong> ${permitNumber}</li>` : ''}
+                    ${rejectionReason ? `<li><strong>Rejection Reason:</strong> ${rejectionReason}</li>` : ''}
+                </ul>
+                ${status === 'approved' ? 
+                    '<p>🎉 Congratulations! Your permit has been approved. You can now operate legally.</p>' :
+                    '<p>❌ Unfortunately, your permit was not approved. Please address the issues and resubmit.</p>'
+                }
+            `
+        }),
+
+
         paymentCompleted: (guestEmail, hostEmail, locationTitle, bookingDetails) => [
             // Email pentru guest
             {

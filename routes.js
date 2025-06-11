@@ -32,6 +32,13 @@ const {
     initiatePaymentForAcceptedBooking, 
     completePaymentForAcceptedBooking 
 } = require('./controllers/postAcceptPaymentController');
+const { getPermitRequirements } = require('./controllers/getPermitRequirements');
+const { 
+    getLocationPermits, 
+    getPendingPermits, 
+    reviewPermit,
+    checkLocationCompliance
+} = require('./controllers/permitController');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -102,6 +109,12 @@ router.post('/complete-payment-for-booking', [], completePaymentForAcceptedBooki
 
 // router.get('/government-stats', getGovernmentStats);
 //router.get('/host-earnings/:host_email', getHostEarnings);
+
+router.post('/getPermitRequirements', [], getPermitRequirements);
+router.get('/location/:location_id/permits', getLocationPermits);
+router.get('/permits/pending', getPendingPermits);
+router.put('/permits/:permit_id/review', [], reviewPermit);
+router.get('/location/:location_id/compliance', checkLocationCompliance);
 
 
 module.exports = router;
