@@ -9,7 +9,6 @@ exports.getLocations = async(req,res,next) => {
         return res.status(422).json({ errors: errors.array() });
     }
     
-    
 
     try{
       let filters = {
@@ -138,6 +137,10 @@ exports.getLocations = async(req,res,next) => {
 
       if(req.body?.furnished == "No") {
         filters = {...filters, furnished: "no"}
+      }
+
+      if(req.body?.activated == true) {
+        filters = {...filters, activated: true}
       }
 
 

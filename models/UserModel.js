@@ -34,6 +34,31 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  
+  total_earnings: {
+    type: Number,
+    default: 0
+  },
+  total_bookings_hosted: {
+    type: Number,
+    default: 0
+  },
+  total_bookings_made: {
+    type: Number,
+    default: 0
+  },
+  
+  // Timestamps
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  last_login: {
+    type: Date,
+    default: Date.now
+  }
+
+
 
 });
 

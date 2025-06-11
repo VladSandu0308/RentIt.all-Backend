@@ -1,6 +1,7 @@
 const {validationResult} = require('express-validator');
 const locationModel = require('../models/LocationModel');
 const connectionModel = require('../models/ConnectionModel');
+const EmailService = require('../services/emailService');
 var amqp = require('amqplib/callback_api');
 
 exports.clientRequestForLocation = async(req,res,next) => {
@@ -13,45 +14,24 @@ exports.clientRequestForLocation = async(req,res,next) => {
 
     try{
         const connection = new connectionModel(req.body);
-
         await connection.save();
+        console.log("✅ Connection created successfully:", connection._id);
 
-        amqp.connect('amqp://rabbitmq', function(error0, connection) {
-            if (error0) {
-                throw error0;
-            }
-            connection.createChannel(function(error1, channel) {
-                if (error1) {
-                    throw error1;
-                }
+       // 2. Trimite email de notificare (non-blocking)
+        EmailService.sendTemplateEmail(
+            'newRequest', 
+            req.body.host_email, 
+            req.body.location_title
+        );
 
-                var queue = 'queue';
-                var body = {
-                    from: 'house_share@gmail.com',
-                    to: req.body.host_email,
-                    subject: `New request for location ${req.body.location_title}`,
-                    text: `You have received a new request for location ${req.body.location_title}. Check your account!`
-                };
-
-                let message = JSON.stringify(body);
-
-
-                channel.assertQueue(queue, {
-                    durable: true
-                });
-
-                channel.sendToQueue(queue, Buffer.from(message));
-                console.log(" [x] Sent %s", body.from);
-
-                return res.status(201).json({
-                    message: "Connection succesfully registered!",
-                });
-
-            });
+        // 3. Returnează răspuns imediat (nu așteaptă email-ul)
+        return res.status(201).json({
+            message: "Connection successfully registered!",
+            connection_id: connection._id
         });
-       
                         
     } catch(err){
+        console.error('❌ Database error in clientRequestForLocation:', err);
         next(err);
     }
 }

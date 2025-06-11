@@ -27,6 +27,11 @@ const { addGradeToLocation } = require('./controllers/addGrateToLocation');
 const { addBlogPost } = require('./controllers/addBlogPost');
 const { getPosts } = require('./controllers/getBlogs');
 const { contact } = require('./controllers/contact');
+const { createPaymentIntent, confirmPayment, getGovernmentStats, stripeWebhook } = require('./controllers/paymentController');
+const { 
+    initiatePaymentForAcceptedBooking, 
+    completePaymentForAcceptedBooking 
+} = require('./controllers/postAcceptPaymentController');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -86,6 +91,17 @@ router.post('/blog', [], addBlogPost);
 router.get('/blog', getPosts);
 
 router.post('/contact', [], contact);
+
+// Payment routes
+router.post('/create-payment-intent', [], createPaymentIntent);
+router.post('/confirm-payment', [], confirmPayment);
+// //router.post('/webhook/stripe', express.raw({type: 'application/json'}), stripeWebhook);
+
+router.post('/initiate-payment-for-booking', [], initiatePaymentForAcceptedBooking);
+router.post('/complete-payment-for-booking', [], completePaymentForAcceptedBooking);
+
+// router.get('/government-stats', getGovernmentStats);
+//router.get('/host-earnings/:host_email', getHostEarnings);
 
 
 module.exports = router;

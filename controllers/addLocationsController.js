@@ -15,7 +15,7 @@ exports.addLocation = async(req,res,next) => {
 
         await location.save();
 
-        console.log("S-a salvat va rog");
+        console.log(req.body);
 
         amqp.connect('amqp://rabbitmq', function(error0, connection) {
             if (error0) {
@@ -30,8 +30,8 @@ exports.addLocation = async(req,res,next) => {
                 var body = {
                 from: 'house_share@gmail.com',
                 to: 'vlad.sandu@lsacbucuresti.ro',
-                subject: `Cerere de înscriere în turism - ${req.body.location_title}`,
-                html: `<p>There is a new reuqest for ${req.body.location_title}. View PDF: <a href="${req.body.cerere}">Click here</a></p>`
+                subject: `Cerere de înscriere în turism - ${req.body.title}`,
+                html: `<p>There is a new reuqest for ${req.body.title}. View PDF: <a href="${req.body.cerere}">Click here</a></p>`
                 };
 
                 let message = JSON.stringify(body);

@@ -42,10 +42,10 @@ const LocationSchema = new mongoose.Schema({
     type: Number
   },
   cerere: {
-    String
+    type: String
   },
   activated: {
-    Boolean
+    type: Boolean
   },
   review_count: {
     type: Number
@@ -95,9 +95,37 @@ const LocationSchema = new mongoose.Schema({
       from: 2022-06-12,
       to: 2022-06-17
     }]
+  },
+
+  total_bookings: {
+    type: Number,
+    default: 0
+  },
+  total_revenue_generated: {
+    type: Number,
+    default: 0
+  },
+  total_nights_booked: {
+    type: Number,
+    default: 0
+  },
+  
+  // Timestamps
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now
   }
 
 });
+
+// Index pentru performanță
+LocationSchema.index({ host_email: 1 });
+LocationSchema.index({ mode: 1 });
+LocationSchema.index({ coords: '2dsphere' }); // Pentru geolocation queries
 
 const Location = mongoose.model("Location", LocationSchema);
 

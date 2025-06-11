@@ -1,10 +1,9 @@
 const {validationResult} = require('express-validator');
 const locationModel = require('../models/LocationModel');
 const connectionModel = require('../models/ConnectionModel');
-var amqp = require('amqplib/callback_api');
+const EmailService = require('../services/emailService');
 
-
-exports.acceptConnectionRequest = async(req,res,next) => {
+exports.acceptConnectionRequest = async(req, res, next) => {
     console.log("Enter accept connection");
     const errors = validationResult(req);
 
@@ -12,98 +11,76 @@ exports.acceptConnectionRequest = async(req,res,next) => {
         return res.status(422).json({ errors: errors.array() });
     }
 
-    try{
-        const connection = await connectionModel.findByIdAndUpdate(
-          req.params.id,
-          { $set: {
-            status: "Request accepted by host",
-            completed: true
-          }},
-          { new: true}
-        )
-
-        const location = await locationModel.findByIdAndUpdate(
-            connection.location_id,
-            { $push: {unavailableDates: {
-                from: connection.from,
-                to: connection.to
-            }} },
-            { new: true }
+    try {
+        // Acceptă cererea
+        const acceptedConnection = await connectionModel.findByIdAndUpdate(
+            req.params.id,
+            { $set: {
+                status: "Request accepted by host - Awaiting payment",
+                completed: false // Rămâne false până la plată
+            }},
+            { new: true}
         );
 
-        amqp.connect('amqp://rabbitmq', function(error0, connection) {
-            if (error0) {
-                throw error0;
-            }
-            connection.createChannel(function(error1, channel) {
-                if (error1) {
-                    throw error1;
-                }
+        if (!acceptedConnection) {
+            return res.status(404).json({ message: "Connection not found" });
+        }
 
-                var queue = 'queue';
-                var body = {
-                    from: 'house_share@gmail.com',
-                    to: req.body.email,
-                    subject: `Request accepted for location ${req.body.location_title}`,
-                    text: `Your request for location ${req.body.location_title} has been accepted. You can now start the payment process!`
-                };
+        // Trimite email de confirmare acceptare folosind EmailService
+        EmailService.sendTemplateEmail(
+            'requestAccepted', 
+            req.body.email, 
+            req.body.location_title
+        );
 
-                let message = JSON.stringify(body);
-
-
-                channel.assertQueue(queue, {
-                    durable: true
-                });
-
-                channel.sendToQueue(queue, Buffer.from(message));
-                console.log(" [x] Sent %s", body.from);
-
-            });
+        // Găsește toate cererile PENDING pentru aceeași locație (exclusiv cea acceptată)
+        const conflictingConnections = await connectionModel.find({
+            'location_id': acceptedConnection.location_id, 
+            'status': { $in: ['Pending', 'Request accepted by host - Awaiting payment'] },
+            '_id': { $ne: acceptedConnection._id } // Exclude cererea acceptată
         });
 
-        try{
-            connectionModel.find({'location_id': connection.location_id, 'completed': false}, async function (err, conn) {
-             if (err) return handleError(err);
-   
-             if(conn.length == 0) {
-                return res.status(201).json({
-                    message: "Connection succesfully accepted and no other conflicts!",
-                });
-             }
+        console.log(`Found ${conflictingConnections.length} potential conflicting connections`);
 
-             for (let i = 0; i < conn.length; ++i) {
-                if (!(conn[i].from > connection.to || conn[i].to < connection.from)) {
-                    try{
-                        const updated = await connectionModel.findByIdAndUpdate(
-                          conn[i]._id,
-                          { $set: {
-                            status: "Request rejected because of conflict",
-                            completed: false
-                          }},
-                          { new: true}
-                        );                  
-                      } catch(err){
-                          next(err);
-                      }
-                }
-             }
+        let conflictsFound = 0;
 
-            
-            
-            console.log(location)
+        // Verifică doar cererile care se suprapun cu perioada acceptată
+        for (let connection of conflictingConnections) {
+            // Verifică dacă există suprapunere de date
+            const hasOverlap = !(
+                new Date(connection.from) > new Date(acceptedConnection.to) || 
+                new Date(connection.to) < new Date(acceptedConnection.from)
+            );
 
-             return res.status(201).json({
-                message: "Connection succesfully accepted and found conflict!",
-            });
-           })
-                           
-       } catch(err){
-           next(err);
-       }
+            if (hasOverlap) {
+                console.log(`Conflict found with connection ${connection._id}`);
+                
+                // Rejectează cererea conflictuală
+                await connectionModel.findByIdAndUpdate(
+                    connection._id,
+                    { $set: {
+                        status: "Request rejected because of conflict",
+                        completed: false
+                    }},
+                    { new: true}
+                );
+                
+                conflictsFound++;
+            }
+        }
 
-        
+        console.log(`Total conflicts resolved: ${conflictsFound}`);
+
+        return res.status(201).json({
+            message: conflictsFound > 0 
+                ? `Connection successfully accepted! ${conflictsFound} conflicting request(s) automatically rejected.`
+                : "Connection successfully accepted with no conflicts!",
+            acceptedConnection: acceptedConnection,
+            conflictsResolved: conflictsFound
+        });
                         
-    } catch(err){
+    } catch(err) {
+        console.error('Error in acceptConnectionRequest:', err);
         next(err);
     }
-}
+};
