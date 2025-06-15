@@ -6,6 +6,7 @@ const connectionModel = require('../models/ConnectionModel');
 const locationModel = require('../models/LocationModel');
 const userModel = require('../models/UserModel');
 const EmailService = require('../services/emailService');
+const ReceiptService = require('../services/receiptService');
 var amqp = require('amqplib/callback_api');
 
 // Inițiere plată pentru o rezervare deja acceptată
@@ -223,7 +224,24 @@ exports.completePaymentForAcceptedBooking = async (req, res, next) => {
             const user = await userModel.findById(payment.user_id);
             const host = await userModel.findById(payment.host_id);
 
-            // 4. Trimite email-uri de confirmare
+            // 4. **NEW: Generate receipt automatically**
+            try {
+                console.log('🧾 Generating receipt for booking:', connection._id);
+                const receiptUrl = await ReceiptService.generateReceiptPDF(connection, location, user);
+                
+                // Save receipt URL to booking
+                await connectionModel.findByIdAndUpdate(
+                    payment.connection_id,
+                    { receipt_url: receiptUrl },
+                    { new: true }
+                );
+                
+                console.log('✅ Receipt generated and saved:', receiptUrl);
+            } catch (receiptError) {
+                console.error('❌ Receipt generation failed, but payment succeeded:', receiptError);
+                // Don't fail the payment if receipt generation fails
+            }
+
             // 4. Trimite email-uri de confirmare folosind EmailService
             const bookingDetails = {
                 checkIn: connection.from.toDateString(),
@@ -235,7 +253,8 @@ exports.completePaymentForAcceptedBooking = async (req, res, next) => {
                 hostName: `${host.first_name} ${host.last_name}`,
                 guestName: `${user.first_name} ${user.last_name}`,
                 guestPhone: user.phone || 'Not provided',
-                address: location.location
+                address: location.location,
+                receiptUrl: connection.receipt_url // Include receipt URL in email
             };
 
             EmailService.sendTemplateEmail(

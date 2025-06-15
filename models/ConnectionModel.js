@@ -48,7 +48,42 @@ const ConnectionSchema = new mongoose.Schema({
   updated_at: {
     type: Date,
     default: Date.now
-  }
+  },
+
+  receipt_url: {
+    type: String,
+    default: null
+  }, // Firebase URL for the receipt PDF
+
+
+   // ADD THESE NEW INVOICE FIELDS:
+  invoice_status: {
+    type: String,
+    enum: ['none', 'requested', 'processing', 'generated'],
+    default: 'none'
+  },
+  invoice_details: {
+    company_name: String,
+    cui: String,
+    reg_com: String,
+    address: String,
+    bank_name: String,
+    bank_account: String,
+    contact_person: String,
+    contact_email: String,
+    contact_phone: String,
+    notes: String
+  },
+  invoice_file_url: String, // Firebase URL for the invoice PDF
+  invoice_number: String,
+  invoice_date: Date,
+  invoice_method: {
+    type: String,
+    enum: ['manual', 'rentit'],
+    default: null
+  },
+  invoice_requested_at: Date,
+  invoice_generated_at: Date,
 
 
 });

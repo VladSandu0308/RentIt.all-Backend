@@ -67,6 +67,32 @@ class EmailService {
             `
         }),
 
+        invoiceRequested: (hostEmail, locationTitle, companyName) => ({
+            from: 'house_share@gmail.com',
+            to: hostEmail,
+            subject: `Invoice Request: ${locationTitle}`,
+            html: `
+                <h2>📋 Invoice Request Received</h2>
+                <p>You have received a new invoice request for your property <strong>${locationTitle}</strong>.</p>
+                <p><strong>Requesting Company:</strong> ${companyName}</p>
+                <p>Please log into your host dashboard to generate and send the fiscal invoice.</p>
+                <p>Thank you for using our platform!</p>
+            `
+        }),
+
+        invoiceGenerated: (guestEmail, locationTitle, companyName) => ({
+            from: 'house_share@gmail.com',
+            to: guestEmail,
+            subject: `Invoice Ready: ${locationTitle}`,
+            html: `
+                <h2>📄 Your Fiscal Invoice is Ready!</h2>
+                <p>The fiscal invoice for your booking at <strong>${locationTitle}</strong> has been generated.</p>
+                <p><strong>Company:</strong> ${companyName}</p>
+                <p>You can now download your invoice from your bookings page.</p>
+                <p>Thank you for using our platform!</p>
+            `
+        }),
+
         permitSubmitted: (ministerEmail, locationTitle, permitType) => ({
             from: 'house_share@gmail.com',
             to: ministerEmail,

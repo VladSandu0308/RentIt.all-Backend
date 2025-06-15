@@ -149,6 +149,58 @@ exports.reviewPermit = async(req, res, next) => {
     }
 };
 
+exports.createPermit = async(req, res, next) => {
+    console.log("Enter create permit");
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try{
+        const { location_id, permit_type, document_url, status = 'pending' } = req.body;
+
+        // Verifică dacă locația există
+        const location = await locationModel.findById(location_id);
+        if (!location) {
+            return res.status(404).json({ message: "Location not found" });
+        }
+
+        // Șterge permisul vechi de același tip (dacă există)
+        await permitModel.findOneAndDelete({ 
+            location_id: location_id, 
+            permit_type: permit_type 
+        });
+
+        // Creează permisul nou
+        const permit = new permitModel({
+            location_id,
+            permit_type,
+            document_url,
+            status
+        });
+
+        await permit.save();
+
+        // Trimite notificare către minister
+        EmailService.sendTemplateEmail(
+            'permitSubmitted',
+            'minister@rentit.all',
+            location.title,
+            permit_type
+        );
+
+        return res.status(201).json({
+            message: "Permit created successfully",
+            permit: permit
+        });
+
+    } catch(err){
+        console.error('Error creating permit:', err);
+        next(err);
+    }
+};
+
 exports.checkLocationCompliance = async(req, res, next) => {
     console.log("Enter check location compliance");
     

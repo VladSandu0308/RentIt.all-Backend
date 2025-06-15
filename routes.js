@@ -37,8 +37,17 @@ const {
     getLocationPermits, 
     getPendingPermits, 
     reviewPermit,
-    checkLocationCompliance
+    checkLocationCompliance,
+    createPermit
 } = require('./controllers/permitController');
+const { 
+    requestInvoice, 
+    generateInvoice, 
+    updateInvoiceStatus, 
+    getInvoiceDownloadUrl,
+    getInvoiceRequests,
+    downloadReceipt
+} = require('./controllers/invoiceController');
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -114,7 +123,16 @@ router.post('/getPermitRequirements', [], getPermitRequirements);
 router.get('/location/:location_id/permits', getLocationPermits);
 router.get('/permits/pending', getPendingPermits);
 router.put('/permits/:permit_id/review', [], reviewPermit);
+router.post('/permits', [], createPermit);
 router.get('/location/:location_id/compliance', checkLocationCompliance);
+
+// Invoice routes
+router.post('/requestInvoice/:bookingId', [], requestInvoice);
+router.post('/generateInvoice/:bookingId', [], generateInvoice);
+router.put('/updateInvoiceStatus/:bookingId', [], updateInvoiceStatus);
+router.get('/downloadInvoice/:bookingId', getInvoiceDownloadUrl);
+router.get('/getInvoiceRequests/:locationId', getInvoiceRequests);
+router.get('/downloadReceipt/:bookingId', downloadReceipt);
 
 
 module.exports = router;
