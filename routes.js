@@ -48,6 +48,8 @@ const {
     getInvoiceRequests,
     downloadReceipt
 } = require('./controllers/invoiceController');
+const { createEvent, getEvents, updateEvent, deleteEvent } = require('./controllers/eventController');
+
 
 router.post('/register', [
   body('first_name',"The name must be of minimum 2 characters length")
@@ -133,6 +135,12 @@ router.put('/updateInvoiceStatus/:bookingId', [], updateInvoiceStatus);
 router.get('/downloadInvoice/:bookingId', getInvoiceDownloadUrl);
 router.get('/getInvoiceRequests/:locationId', getInvoiceRequests);
 router.get('/downloadReceipt/:bookingId', downloadReceipt);
+
+// Event routes
+router.post('/events', [], createEvent);
+router.get('/events', getEvents);
+router.put('/events/:id', [], updateEvent);
+router.delete('/events/:id', deleteEvent);
 
 
 module.exports = router;
